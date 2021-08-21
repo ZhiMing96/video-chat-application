@@ -14,11 +14,13 @@ const Video = ({ peer }) => {
 
 export const Room = () => {
   const socket = io('http://localhost:5000');
-  const ROOM_ID = 50;
+
   const [peers, setPeers] = useState([]);
 
   const userVideoRef = useRef();
   const peerRefs = useRef([]);
+  const socketRef = useRef();
+  socketRef.current = socket;
 
   useEffect(() => {
     navigator.mediaDevices
@@ -28,9 +30,9 @@ export const Room = () => {
       })
       .then((stream) => {
         userVideoRef.current.srcObject = stream;
-        socket.emit('joined-room', 'Room 1');
+        socketRef.current.emit('joined-room', 'Room 1');
 
-        socket.on(
+        socketRef.current.on(
           'users-in-room',
           ({ usersInRoom, socketId: userSocketId }) => {
             usersInRoom.forEach((socketId) => {
@@ -47,7 +49,7 @@ export const Room = () => {
               setPeers((users) => [...users, peerObj]);
 
               peer.on('signal', (signal) => {
-                socket.emit('requesting-to-connect-stream', {
+                socketRef.current.emit('requesting-to-connect-stream', {
                   newPeerSignal: signal,
                   userToConnectTo: socketId,
                   newPeerSocketId: userSocketId,
@@ -63,7 +65,7 @@ export const Room = () => {
           }
         );
 
-        socket.on(
+        socketRef.current.on(
           'new-stream-incoming',
           ({ newPeerSignal, newPeerSocketId }) => {
             const peer = new Peer({
@@ -72,7 +74,7 @@ export const Room = () => {
               stream,
             });
             peer.on('signal', (signal) => {
-              socket.emit('added-new-stream', {
+              socketRef.current.emit('added-new-stream', {
                 otherUserSignal: signal,
                 newPeerSocketId,
               });
@@ -95,7 +97,7 @@ export const Room = () => {
           }
         );
 
-        socket.on(
+        socketRef.current.on(
           'new-peer-stream-added',
           ({ otherUserSignal, otherUserSocketId }) => {
             const item = peerRefs.current.find(
@@ -109,7 +111,7 @@ export const Room = () => {
       .catch((error) => {
         console.error('Error accessing media devices.', error);
       });
-    socket.on('user-disconnected', (socketId) => {
+    socketRef.current.on('user-disconnected', (socketId) => {
       console.log(`user ${socketId} left the room`);
       const peerObjsLeft = peerRefs.current.filter(
         (peerObj) => peerObj.peerSocketId !== socketId
