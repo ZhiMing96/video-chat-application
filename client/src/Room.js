@@ -19,8 +19,7 @@ export const Room = () => {
 
   const userVideoRef = useRef();
   const peerRefs = useRef([]);
-  const socketRef = useRef();
-  socketRef.current = socket;
+  const socketRef = useRef(socket);
 
   useEffect(() => {
     navigator.mediaDevices
