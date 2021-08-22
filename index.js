@@ -2,11 +2,19 @@ const app = require('express')();
 const cors = require('cors');
 const server = require('http').createServer(app);
 
+app.use(cors());
 const io = require('socket.io')(server, {
   cors: {
     origin: ['http://localhost:3000', 'https://videoapp.kohzhiming.com/'],
     methods: ['GET', 'POST'],
   },
+  // handlePreflightRequest: (req, res) => {
+  //   res.writeHead(200, {
+  //     'Access-Control-Allow-Origin': 'https://videoapp.kohzhiming.com/',
+  //     'Access-Control-Allow-Methods': 'GET,POST',
+  //   });
+  //   res.end();
+  // },
 });
 
 const rooms = {};
