@@ -13,7 +13,9 @@ const Video = ({ peer }) => {
 };
 
 export const Room = () => {
-  const socket = io('https://stark-thicket-56076.herokuapp.com/');
+  const socket = io('https://stark-thicket-56076.herokuapp.com/', {
+    transports: ['websocket'],
+  });
 
   const [peers, setPeers] = useState([]);
 
