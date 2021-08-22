@@ -4,10 +4,7 @@ const server = require('http').createServer(app);
 
 const io = require('socket.io')(server, {
   cors: {
-    origin: [
-      'http://localhost:3000',
-      'https://stark-thicket-56076.herokuapp.com/',
-    ],
+    origin: ['http://localhost:3000', 'https://videoapp.kohzhiming.com/'],
     methods: ['GET', 'POST'],
   },
 });
